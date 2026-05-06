@@ -1,7 +1,6 @@
-#!/home/vboxuser/caravel_user_sram/openlane/.venv/bin/python3
+#!/home/vboxuser/caravel_user_Neuromorphic_X1_32x32/openlane/.venv/bin/python3
 import sys
 from librelane.state.__main__ import cli
 if __name__ == '__main__':
-    if sys.argv[0].endswith('.exe'):
-        sys.argv[0] = sys.argv[0][:-4]
+    sys.argv[0] = sys.argv[0].removesuffix('.exe')
     sys.exit(cli())
