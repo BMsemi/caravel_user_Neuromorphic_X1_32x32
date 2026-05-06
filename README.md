@@ -46,7 +46,6 @@ make user_project_wrapper
 
 ```
 Replace content of  /verilog/rtl/user_project_wrapper.v with user_project_wrapper_multi_inst.v
-Replace content of /openlane/user_project_wrapper/config.json with config_multi_inst.json
 make user_project_wrapper
 ```
 
