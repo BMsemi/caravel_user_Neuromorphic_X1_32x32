@@ -1,8 +1,8 @@
-CARAVEL_ROOT: /Users/marwan/work/caravel_user_sram/caravel
-MCW_ROOT: /Users/marwan/work/caravel_user_sram/mgmt_core_wrapper
+CARAVEL_ROOT: /home/vboxuser/caravel_user_Neuromorphic_X1_32x32/caravel
+MCW_ROOT: /home/vboxuser/caravel_user_Neuromorphic_X1_32x32/mgmt_core_wrapper
 PDK: sky130A
-PDK_ROOT: /Users/marwan/work/caravel_user_sram/dependencies/pdks
-USER_PROJECT_ROOT: /Users/marwan/work/caravel_user_sram
+PDK_ROOT: /home/vboxuser/caravel_user_Neuromorphic_X1_32x32/dependencies/pdks
+USER_PROJECT_ROOT: /home/vboxuser/caravel_user_Neuromorphic_X1_32x32
 caravan: false
 clk: 25
 emailto:
