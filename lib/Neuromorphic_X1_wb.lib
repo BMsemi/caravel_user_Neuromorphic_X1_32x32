@@ -156,14 +156,14 @@ pin (ScanInCC) {
   max_transition : 0.50;
 }
 
-pin (VDDC) {
+pin (VDDC1) {
   direction : inout;
   capacitance : 0.01;
   max_transition : 0.50;
   signal_type : POWER;
 }
 
-pg_pin(VDDC) {
+pg_pin(VDDC1) {
   pg_type : primary_power;
 }
 
@@ -178,14 +178,14 @@ pg_pin(VSS) {
   pg_type : primary_ground;
 }
 
-pin (VDDA) {
+pin (VDDC2) {
   direction : inout;
   capacitance : 0.01;
   max_transition : 0.50;
   signal_type : POWER;
 }
 
-pg_pin(VDDA) {
+pg_pin(VDDC2) {
   pg_type : primary_power;
 }
 
@@ -213,25 +213,35 @@ pin (Bias_comp2) {
   max_transition : 0.50;
 }
 
-pin (Vcc_L) {
-  direction : input;
+pin (VDDA1) {
+  direction : inout;
   capacitance : 0.01;
   max_transition : 0.50;
+  signal_type : POWER;
 }
 
-pin (Vcc_Body) {
-  direction : input;
-  capacitance : 0.01;
-  max_transition : 0.50;
+pg_pin(VDDA1) {
+  pg_type : primary_power;
 }
 
-pin (Vcc_reset) {
-  direction : input;
+pin (VDDA2) {
+  direction : inout;
   capacitance : 0.01;
   max_transition : 0.50;
+  signal_type : POWER;
+}
+
+pg_pin(VDDA2) {
+  pg_type : primary_power;
 }
 
 pin (Vcc_set) {
+  direction : input;
+  capacitance : 0.01;
+  max_transition : 0.50;
+}
+
+pin (dc_bias) {
   direction : input;
   capacitance : 0.01;
   max_transition : 0.50;
