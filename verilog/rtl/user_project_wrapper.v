@@ -45,10 +45,12 @@ module user_project_wrapper #(
     // -----------------------------
     // Instantiate your hard macro
     // -----------------------------
-   Neuromorphic_X1_wb mprj (
+   Neuromorphic_X1_wb neuro_inst (
 `ifdef USE_POWER_PINS
-  .VDDC (vccd1),
-  .VDDA (vdda1),
+  .VDDC1 (vccd1),
+  .VDDC2 (vccd2),
+  .VDDA1 (vdda1),
+  .VDDA2 (vdda2),
   .VSS  (vssd1),
 `endif
 
@@ -69,29 +71,26 @@ module user_project_wrapper #(
   .wbs_ack_o (wbs_ack_o),
 
   // Scan/Test
-  .ScanInCC  (io_in[4]),
-  .ScanInDL  (io_in[1]),
-  .ScanInDR  (io_in[2]),
-  .TM        (io_in[5]),
-  .ScanOutCC (io_out[0]),
+  .ScanInCC  (io_in[35]),
+  .ScanInDL  (io_in[22]),
+  .ScanInDR  (io_in[21]),
+  .TM        (io_in[36]),
+  .ScanOutCC (io_out[23]),
 
   // Analog / bias pins (drive from analog_io[] wires you already built)
-  .Iref          (analog_io[0]),
-  .Vcc_read      (analog_io[1]),
-  .Vcomp         (analog_io[2]),
-  .Bias_comp2    (analog_io[3]),
-  .Vcc_wl_read   (analog_io[12]),
-  .Vcc_wl_set    (analog_io[5]),
-  .Vbias         (analog_io[6]),
-  .Vcc_wl_reset  (analog_io[7]),
-  .Vcc_set       (analog_io[8]),
-  .Vcc_reset     (analog_io[9]),
-  .Vcc_L         (analog_io[10]),
-  .Vcc_Body      (analog_io[11])
+  .Iref          (analog_io[27]),
+  .Vcc_read      (analog_io[26]),
+  .Vcomp         (analog_io[25]),
+  .Bias_comp2    (analog_io[24]),
+  .Vcc_wl_read   (analog_io[19]),
+  .Vcc_wl_set    (analog_io[23]),
+  .Vbias         (analog_io[22]),
+  .Vcc_wl_reset  (analog_io[21]),
+  .Vcc_set       (analog_io[20]),
+  .dc_bias       (analog_io[18])
 );
 
 
 endmodule
 `default_nettype wire
-
 
