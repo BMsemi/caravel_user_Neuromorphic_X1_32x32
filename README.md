@@ -17,7 +17,7 @@ This project demonstrates the straightforward integration of a commercial Neurom
 1. **Clone the Repository:**
 
 ```
-git clone https://github.com/Baavanes/caravel_user_Neuromorphic_X1_32x32.git
+git clone https://github.com/BMsemi/caravel_user_Neuromorphic_X1_32x32.git
 ```
 2. **Prepare Your Environment:**
 
@@ -33,9 +33,7 @@ pip install cf-ipm
 4. **Install the Neuromorphic X1 IP:**
 
 ```
-ipm install Neuromorphic_X1_32x32
-Replace the files inside ip/Neuromorphic_X1_32x32/hdl folder with hdl(to_replace_in_IP)
-Rename the folder hdl(to_replace_in_IP) to hdl
+ipm install Neuromorphic_X1_32x32 (IP already present, so no need to do this)
 ```
 
 5. **Harden the User Project Wrapper using librelane/openlane2:**
