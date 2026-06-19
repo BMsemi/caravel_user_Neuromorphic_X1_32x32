@@ -5,13 +5,13 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-1. Go to repo
+Step 1. Go to repo
 
 cd ~/caravel_user_Neuromorphic_X1_32x32 || exit 1
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-2. Create the final NDR patch script
+Step 2. Create the final NDR patch script
 
 cat > patch_drt_ndr.py <<'PY'
 from pathlib import Path
@@ -95,7 +95,7 @@ PY
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-3. Create the patched LibreLane Dockerfile
+Step 3. Create the patched LibreLane Dockerfile
 
 cat > Dockerfile.librelane-ndr-drt <<'DOCKER'
 FROM ghcr.io/librelane/librelane:2.4.0.dev12
@@ -114,7 +114,7 @@ DOCKER
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-4. Remove unsupported NDR keys from config.json
+Step 4. Remove unsupported NDR keys from config.json
 
 python3 - <<'PY'
 import json
@@ -136,7 +136,7 @@ PY
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-5. Build the patched Docker image
+Step 5. Build the patched Docker image
 
 docker rmi librelane-ndr:local 2>/dev/null || true
 
@@ -144,6 +144,6 @@ docker build -t librelane-ndr:local -f Dockerfile.librelane-ndr-drt .
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-6. Run the modified flow (Use the below command instead of plain make user_project_wrapper:)
+Step 6. Run the modified flow (Use the below command instead of plain make user_project_wrapper:)
 
 LIBRELANE_IMAGE_OVERRIDE=librelane-ndr:local make user_project_wrapper
