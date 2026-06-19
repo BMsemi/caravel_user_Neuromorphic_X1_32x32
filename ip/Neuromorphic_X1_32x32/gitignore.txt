@@ -1,0 +1,17 @@
+/.idea/
+/precheck_results/
+*/tmp
+*/*/tmp
+*.hex*
+*.lst
+*.vcd
+*.gtkw
+/env
+/venv
+/caravel
+/dependencies
+/mgmt_core_wrapper
+/logs
+# macOS Finder metadata
+.DS_Store
+**/.DS_Store
