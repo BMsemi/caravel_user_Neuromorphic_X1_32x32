@@ -42,4 +42,10 @@ ipm install Neuromorphic_X1_32x32 (IP already present, so no need to do this)
 make user_project_wrapper
 ```
 
+6. **Harden the User Project Wrapper using librelane/openlane2: If wide Analog Routing is Required follow the steps below**
+
+```
+use **Widen_Analog_Routig_using_NDR.txt** file where instructions to widen the Analog Routing using NDR is given.
+```
+
 Details about the Neuromorphic X1 IP itself are available in the [Neuromorphic X1 documentation](https://github.com/BMsemi/Neuromorphic_X1_32x32)
