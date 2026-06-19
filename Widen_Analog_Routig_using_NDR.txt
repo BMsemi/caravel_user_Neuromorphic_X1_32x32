@@ -1,0 +1,149 @@
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+                         Instructions to Widen Analog Routig using NDR
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+1. Go to repo
+
+cd ~/caravel_user_Neuromorphic_X1_32x32 || exit 1
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+2. Create the final NDR patch script
+
+cat > patch_drt_ndr.py <<'PY'
+from pathlib import Path
+
+p = Path("/opt/librelane_patched/librelane/scripts/openroad/drt.tcl")
+s = p.read_text()
+insert = r"""
+# BEGIN BM_ANALOG_NDR
+
+# Analog supply NDR
+# Do not change: kept as previously clean
+create_ndr -name NDR_ANALOG_SUPPLY \
+  -width {li1 0.17 met1 3.0 met2 3.0 met3 3.0 met4 3.6 met5 3.6} \
+  -spacing {li1 0.17 met1 1.5 met2 1.5 met3 1.5 met4 1.8 met5 1.8}
+
+# analog_io[24] = Bias_comp2
+# Do not change: previously DRC/LVS clean
+create_ndr -name NDR_ANALOG_BIAS_SAFE \
+  -width {li1 0.17 met1 3.0 met2 3.0 met3 3.0 met4 3.0 met5 3.0} \
+  -spacing {li1 0.17 met1 1.5 met2 1.5 met3 1.5 met4 1.5 met5 1.5}
+
+# analog_io[18] = dc_bias
+# Clean OpenLane result:
+# Route DRC clean, Magic DRC clean, KLayout DRC clean, LVS clean
+create_ndr -name NDR_ANALOG_DC_BIAS_EXTRA_SAFE \
+  -width {li1 0.17 met1 3.0 met2 3.0 met3 3.0 met4 3.0 met5 3.0} \
+  -spacing {li1 0.17 met1 0.14 met2 0.8 met3 0.8 met4 0.6 met5 1.5}
+
+set analog_supply_nets [list \
+    {analog_io[19]} \
+    {analog_io[20]} \
+    {analog_io[21]} \
+    {analog_io[22]} \
+    {analog_io[23]} \
+    {analog_io[25]} \
+    {analog_io[26]} \
+    {analog_io[27]} \
+]
+
+set analog_bias_safe_nets [list \
+    {analog_io[24]} \
+]
+
+set analog_dc_bias_extra_safe_nets [list \
+    {analog_io[18]} \
+]
+
+foreach net [$::block getNets] {
+    set net_name [odb::dbNet_getName $net]
+    if {[lsearch -exact $analog_dc_bias_extra_safe_nets $net_name] >= 0} {
+        puts "INFO Assigning NDR_ANALOG_DC_BIAS_EXTRA_SAFE to $net_name"
+        assign_ndr -ndr NDR_ANALOG_DC_BIAS_EXTRA_SAFE -net $net_name
+    } elseif {[lsearch -exact $analog_bias_safe_nets $net_name] >= 0} {
+        puts "INFO Assigning NDR_ANALOG_BIAS_SAFE to $net_name"
+        assign_ndr -ndr NDR_ANALOG_BIAS_SAFE -net $net_name
+    } elseif {[lsearch -exact $analog_supply_nets $net_name] >= 0} {
+        puts "INFO Assigning NDR_ANALOG_SUPPLY to $net_name"
+        assign_ndr -ndr NDR_ANALOG_SUPPLY -net $net_name
+    }
+}
+
+# END BM_ANALOG_NDR
+"""
+start = "# BEGIN BM_ANALOG_NDR"
+end = "# END BM_ANALOG_NDR"
+if start in s and end in s:
+    before, rest = s.split(start, 1)
+    _, after = rest.split(end, 1)
+    s = before + insert + after
+elif "read_current_odb\n" in s:
+    s = s.replace("read_current_odb\n", "read_current_odb\n" + insert + "\n", 1)
+else:
+    raise RuntimeError("Unable to find insertion point in drt.tcl")
+if "unset -nocomplain ::env(DIODE_CELL)" not in s:
+    s = s.replace(
+        "incr i\n\nif { ![info exists ::env(DIODE_CELL)] }",
+        "incr i\n\nunset -nocomplain ::env(DIODE_CELL)\n\nif { ![info exists ::env(DIODE_CELL)] }"
+    )
+p.write_text(s)
+PY
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+3. Create the patched LibreLane Dockerfile
+
+cat > Dockerfile.librelane-ndr-drt <<'DOCKER'
+FROM ghcr.io/librelane/librelane:2.4.0.dev12
+USER root
+
+COPY patch_drt_ndr.py /tmp/patch_drt_ndr.py
+
+RUN set -eux; \
+    LL_SRC="$(python3 -c 'import os, librelane; print(os.path.dirname(librelane.__file__))')"; \
+    mkdir -p /opt/librelane_patched; \
+    cp -a "$LL_SRC" /opt/librelane_patched/librelane; \
+    python3 /tmp/patch_drt_ndr.py
+
+ENV PYTHONPATH=/opt/librelane_patched
+DOCKER
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+4. Remove unsupported NDR keys from config.json
+
+python3 - <<'PY'
+import json
+from pathlib import Path
+
+p = Path("openlane/user_project_wrapper/config.json")
+data = json.loads(p.read_text())
+
+for k in [
+    "NON_DEFAULT_RULES",
+    "DRT_ASSIGN_NDR",
+    "DRT_ANTENNA_REPAIR_ITERS"
+]:
+    data.pop(k, None)
+
+p.write_text(json.dumps(data, indent=4) + "\n")
+print("Cleaned unsupported NDR keys from", p)
+PY
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+5. Build the patched Docker image
+
+docker rmi librelane-ndr:local 2>/dev/null || true
+
+docker build -t librelane-ndr:local -f Dockerfile.librelane-ndr-drt .
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+6. Run the modified flow (Use the below command instead of plain make user_project_wrapper:)
+
+LIBRELANE_IMAGE_OVERRIDE=librelane-ndr:local make user_project_wrapper
