@@ -17,7 +17,7 @@ This project demonstrates the straightforward integration of a commercial Neurom
 1. **Clone the Repository:**
 
 ```
-git clone https://github.com/Baavanes/caravel_user_Neuromorphic_X1_32x32.git
+git clone https://github.com/BMsemi/caravel_user_Neuromorphic_X1_32x32.git
 ```
 2. **Prepare Your Environment:**
 
@@ -33,15 +33,22 @@ pip install cf-ipm
 4. **Install the Neuromorphic X1 IP:**
 
 ```
-ipm install Neuromorphic_X1_32x32
-Replace the files inside ip/Neuromorphic_X1_32x32/hdl folder with hdl(to_replace_in_IP)
-Rename the folder hdl(to_replace_in_IP) to hdl
+Clone this Github Repo: https://github.com/BMsemi/Neuromorphic_X1_32x32
+Copy the cloned folder Neuromorphic_X1_32x32 and paste it inside the ip folder
+(OR)
+ipm install Neuromorphic_X1_32x32  (if IP is updated in the CF ipm)
 ```
 
 5. **Harden the User Project Wrapper using librelane/openlane2:**
 
 ```
 make user_project_wrapper
+```
+
+6. **Harden the User Project Wrapper using librelane/openlane2: If wide Analog Routing is Required follow the steps below**
+
+```
+use **Widen_Analog_Routig_using_NDR.txt** file where instructions to widen the Analog Routing using NDR is given.
 ```
 
 Details about the Neuromorphic X1 IP itself are available in the [Neuromorphic X1 documentation](https://github.com/BMsemi/Neuromorphic_X1_32x32)
