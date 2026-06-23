@@ -41,6 +41,19 @@ module user_project_wrapper #(
     output [2:0] user_irq
 );
 
+    wire scanout_cc;
+
+    assign la_data_out = 128'b0;
+    assign user_irq     = 3'b000;
+
+    // Drive all GPIO outputs low except GPIO23 = ScanOutCC
+    // MPRJ_IO_PADS = 38, so this is bits [37:24], [23], [22:0]
+    assign io_out = {14'b0, scanout_cc, 23'b0};
+
+    // Disable all GPIO output drivers except GPIO23
+    // io_oeb = 1 means output disabled, 0 means output enabled
+    assign io_oeb = {14'h3fff, 1'b0, 23'h7fffff};
+
 
     // -----------------------------
     // Instantiate your hard macro
@@ -75,7 +88,7 @@ module user_project_wrapper #(
   .ScanInDL  (io_in[22]),
   .ScanInDR  (io_in[21]),
   .TM        (io_in[36]),
-  .ScanOutCC (io_out[23]),
+  .ScanOutCC (scanout_cc),
 
   // Analog / bias pins (drive from analog_io[] wires you already built)
   .Iref          (analog_io[27]),
@@ -93,4 +106,3 @@ module user_project_wrapper #(
 
 endmodule
 `default_nettype wire
-
