@@ -33,7 +33,10 @@ pip install cf-ipm
 4. **Install the Neuromorphic X1 IP:**
 
 ```
-ipm install Neuromorphic_X1_32x32 (IP already present, so no need to do this)
+Clone this Github Repo: https://github.com/BMsemi/Neuromorphic_X1_32x32
+Copy the cloned folder Neuromorphic_X1_32x32 and paste it inside the ip folder
+(OR)
+ipm install Neuromorphic_X1_32x32  (if IP is updated in the CF ipm)
 ```
 
 5. **Harden the User Project Wrapper using librelane/openlane2:**
