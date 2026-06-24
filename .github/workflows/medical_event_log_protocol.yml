@@ -1,0 +1,67 @@
+name: Medical event log protocol
+
+on:
+  push:
+    paths:
+      - ".github/workflows/medical_event_log_protocol.yml"
+      - "tools/medical_event_log_protocol_check.py"
+      - "verilog/dv/cocotb/user_proj_tests/medical_event_log/**"
+      - "verilog/dv/cocotb/cocotb_tests.py"
+      - "verilog/dv/cocotb/user_proj_tests/user_proj_tests.yaml"
+  pull_request:
+    paths:
+      - ".github/workflows/medical_event_log_protocol.yml"
+      - "tools/medical_event_log_protocol_check.py"
+      - "verilog/dv/cocotb/user_proj_tests/medical_event_log/**"
+      - "verilog/dv/cocotb/cocotb_tests.py"
+      - "verilog/dv/cocotb/user_proj_tests/user_proj_tests.yaml"
+  workflow_dispatch:
+
+jobs:
+  protocol-check:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Compile Python sources
+        run: |
+          python3 -m py_compile \
+            tools/medical_event_log_protocol_check.py \
+            verilog/dv/cocotb/user_proj_tests/medical_event_log/medical_event_log.py
+
+      - name: Check firmware C syntax
+        run: |
+          mkdir -p /tmp/medical-event-log-stubs
+          cat > /tmp/medical-event-log-stubs/firmware_apis.h <<'EOF'
+          #ifndef FIRMWARE_APIS_H
+          #define FIRMWARE_APIS_H
+          #define GPIO_MODE_USER_STD_INPUT_NOPULL 0
+          void ManagmentGpio_outputEnable(void);
+          void ManagmentGpio_write(unsigned int value);
+          void GPIOs_configureAll(unsigned int mode);
+          void GPIOs_loadConfigs(void);
+          void User_enableIF(unsigned int enable);
+          #endif
+          EOF
+          cat > /tmp/medical-event-log-stubs/custom_user_space.h <<'EOF'
+          #ifndef CUSTOM_USER_SPACE_H
+          #define CUSTOM_USER_SPACE_H
+          #endif
+          EOF
+          gcc -std=c11 -Wall -Wextra -Werror -Wno-main \
+            -I/tmp/medical-event-log-stubs \
+            -fsyntax-only \
+            verilog/dv/cocotb/user_proj_tests/medical_event_log/medical_event_log.c
+
+      - name: Check test registration
+        run: |
+          grep -F "medical_event_log/medical_event_log.yaml" \
+            verilog/dv/cocotb/user_proj_tests/user_proj_tests.yaml
+          grep -F "name: medical_event_log" \
+            verilog/dv/cocotb/user_proj_tests/medical_event_log/medical_event_log.yaml
+          grep -F "medical_event_log import medical_event_log" \
+            verilog/dv/cocotb/cocotb_tests.py
+
+      - name: Exhaustively check record protocol
+        run: python3 tools/medical_event_log_protocol_check.py
