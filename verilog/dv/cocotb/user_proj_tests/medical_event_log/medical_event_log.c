@@ -119,7 +119,14 @@ static void x1_clear_record(uint32_t row)
 {
     uint32_t column;
 
-    for (column = 0u; column < 32u; ++column) {
+    /* Invalidate the old row before touching payload bits. If power is lost
+     * during the remaining erase, replay sees missing commit bits and rejects
+     * the row instead of accepting a partially modified old record.
+     */
+    x1_reset_cell(row, COMMIT_B_BIT);
+    x1_reset_cell(row, COMMIT_A_BIT);
+
+    for (column = 0u; column < COMMIT_A_BIT; ++column) {
         x1_reset_cell(row, column);
     }
 }
@@ -214,7 +221,11 @@ void main(void)
     x1_program_record(0u, EVENT_BOOT, 1u, 0u,
                       SEVERITY_INFO, COMMIT_BOTH);
 
-    /* Simulated power loss: payload and only commit-A were written. */
+    /* First commit an old record, then simulate an interrupted slot reuse.
+     * The clear path invalidates commit-B before changing the payload.
+     */
+    x1_program_record(1u, EVENT_BOOT, 0u, 1u,
+                      SEVERITY_INFO, COMMIT_BOTH);
     x1_program_record(1u, EVENT_BATTERY_LOW, 2u, 1u,
                       SEVERITY_WARNING, COMMIT_A);
 
