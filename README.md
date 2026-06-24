@@ -10,6 +10,17 @@
 
 This project demonstrates the straightforward integration of a commercial Neuromorphic X1 within the `user_project_wrapper` using the IPM (IP Manager) tool.
 
+## Medical-device event logging demo
+
+The `medical_event_log` firmware+cocotb test uses the X1 mailbox at
+`0x3000_0004` as a 32-slot event journal. Records include CRC-8 and two commit
+bits so firmware can replay complete events while rejecting interrupted or
+corrupted writes.
+
+See [docs/medical_device_event_logger.md](docs/medical_device_event_logger.md)
+for the record format, safety assumptions, test command, GL limitation, and
+signoff checklist.
+
 ## Get Started Quickly
 
 ### Follow these steps to set up your environment and harden the Neuromorphic X1:
